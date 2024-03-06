@@ -48,7 +48,7 @@ fs: kernel busybox
 	cp linux/arch/arm64/boot/dts/broadcom/*.dtb $(BOOT_DIR)
 	cp linux/arch/arm64/boot/dts/overlays/*.dtb* $(BOOT_DIR)/overlays/
 	cp linux/arch/arm64/boot/dts/overlays/README $(BOOT_DIR)/overlays/
-	cp linux/arch/arm64/boot/Image $(BOOT_DIR)/$KERNEL.img
+	cp linux/arch/arm64/boot/Image $(BOOT_DIR)/KERNEL.img
 
 	cp config.txt $(BOOT_DIR)
 	cp cmdline.txt $(BOOT_DIR)
@@ -80,6 +80,8 @@ img: fs
 	mkfs -t vfat /dev/mapper/$${KX}1
 	mkfs -t ext4 /dev/mapper/$${KX}2
 
+	echo /dev/mapper/$${KX}
+
 	mkdir -p $(ROOT_DIR)out/tmp/boot
 	mkdir -p $(ROOT_DIR)out/tmp/rootfs
 
@@ -92,7 +94,7 @@ img: fs
 	umount $(ROOT_DIR)out/tmp/boot
 	umount $(ROOT_DIR)out/tmp/rootfs
 
-	sudo kpartx -dv out/disk.img
+	#sudo kpartx -dv out/disk.img
 	rm -r $(ROOT_DIR)out/tmp
 
 clean:
