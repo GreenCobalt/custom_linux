@@ -1,15 +1,8 @@
-# Use the Linux Kernel we compiled earlier.
+start_file=start4.elf
+fixup_file=fixup4.dat
 kernel=zImage
 
-# Enable UART so we can use a TTL cable.
-enable_uart=1
-
-# Use the appropriate DTB for our device.
+arm_64bit=0
 device_tree=bcm2711-rpi-cm4.dtb
 
-# Disable Bluetooth via device tree overlay.
-# It's a complicated explanation that you
-# can read about here: https://youtu.be/68jbiuf27AY?t=431
-# IF YOU SKIP THIS STEP, your serial connection will not
-# work correctly.
 dtoverlay=disable-bt

@@ -33,9 +33,8 @@ fs: kernel busybox
 	mkdir -p $(INSTALL_MOD_PATH)
 	mkdir -p $(BOOT_DIR)/overlays
 
-	cp firmware/boot/bootcode.bin $(BOOT_DIR)
-	cp firmware/boot/fixup.dat $(BOOT_DIR)
-	cp firmware/boot/start.elf $(BOOT_DIR)
+	cp firmware/boot/fixup4.dat $(BOOT_DIR)
+	cp firmware/boot/start4.elf $(BOOT_DIR)
 	cp linux/arch/arm/boot/zImage $(BOOT_DIR)
 	cp linux/arch/arm/boot/dts/bcm2711-rpi-cm4.dtb $(BOOT_DIR)
 	cp linux/arch/arm/boot/dts/overlays/disable-bt.dtbo $(BOOT_DIR)/overlays
