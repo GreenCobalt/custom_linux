@@ -39,6 +39,8 @@ busybox:
 	$(MAKE) -C busybox -j`nproc`
 
 fs: kernel busybox
+	rm -rf out/
+
 	mkdir -p $(INSTALL_MOD_PATH)
 	mkdir -p $(BOOT_DIR)/overlays
 
@@ -48,7 +50,7 @@ fs: kernel busybox
 	cp linux/arch/arm64/boot/dts/broadcom/*.dtb $(BOOT_DIR)
 	cp linux/arch/arm64/boot/dts/overlays/*.dtb* $(BOOT_DIR)/overlays/
 	cp linux/arch/arm64/boot/dts/overlays/README $(BOOT_DIR)/overlays/
-	cp linux/arch/arm64/boot/Image $(BOOT_DIR)/KERNEL.img
+	cp linux/arch/arm64/boot/Image $(BOOT_DIR)/Image
 
 	cp config.txt $(BOOT_DIR)
 	cp cmdline.txt $(BOOT_DIR)
@@ -56,18 +58,26 @@ fs: kernel busybox
 	$(MAKE) -C linux modules_install
 	$(MAKE) -C busybox install
 
-	mkdir -p $(INSTALL_MOD_PATH)/proc $(INSTALL_MOD_PATH)/sys $(INSTALL_MOD_PATH)/dev $(INSTALL_MOD_PATH)/etc
-
+	mkdir -p $(INSTALL_MOD_PATH)/etc
 	mkdir -p $(INSTALL_MOD_PATH)/etc/init.d
+	mkdir -p $(INSTALL_MOD_PATH)/proc 
+	mkdir -p $(INSTALL_MOD_PATH)/sys
+	mkdir -p $(INSTALL_MOD_PATH)/dev
+	mkdir -p $(INSTALL_MOD_PATH)/tmp
+	mkdir -p $(INSTALL_MOD_PATH)/root
+	mkdir -p $(INSTALL_MOD_PATH)/var
+	mkdir -p $(INSTALL_MOD_PATH)/lib
+	mkdir -p $(INSTALL_MOD_PATH)/mnt
+	mkdir -p $(INSTALL_MOD_PATH)/boot
+
+	install busybox/examples/inittab $(INSTALL_MOD_PATH)/etc/inittab
+
 	touch $(INSTALL_MOD_PATH)/etc/init.d/rcS
 	chmod +x $(INSTALL_MOD_PATH)/etc/init.d/rcS
 
-	echo "#!/bin/sh" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	echo "mount -t devtmpfs none /dev" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	echo "mount -t proc none /proc" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	echo "mount -t sysfs none /sys" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	echo "echo /sbin/mdev > /proc/sys/kernel/hotplug" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
+	echo "#!/bin/sh" > $(INSTALL_MOD_PATH)/etc/init.d/rcS
 	echo "mdev -s" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
+	echo "echo SYSTEM BOOTED TO INIT SPACE" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
 
 	#cd $(INSTALL_MOD_PATH); find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
 
@@ -94,7 +104,7 @@ img: fs
 	umount $(ROOT_DIR)out/tmp/boot
 	umount $(ROOT_DIR)out/tmp/rootfs
 
-	#sudo kpartx -dv out/disk.img
+	sudo kpartx -dv out/disk.img
 	rm -r $(ROOT_DIR)out/tmp
 
 clean:

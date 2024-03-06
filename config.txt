@@ -1,6 +1,12 @@
 start_file=start4.elf
 fixup_file=fixup4.dat
-kernel=zImage
 
-device_tree=bcm2711-rpi-cm4.dtb
-dtoverlay=disable-bt
+kernel=Image
+arm_64bit=1
+dtoverlay=miniuart-bt
+
+dtoverlay=dwc2,dr_mode=host
+otg_mode=1
+
+dtoverlay=i2c0,pins_0_1
+dtoverlay=i2c1,pins_2_3
