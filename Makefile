@@ -1,8 +1,10 @@
 .EXPORT_ALL_VARIABLES:
-ARCH=arm
-KERNEL=kernel7
-CROSS_COMPILE=arm-linux-gnueabihf-
+ARCH=arm64
+KERNEL=kernel8
+CROSS_COMPILE=aarch64-linux-gnu-
 CPU=bcm2711
+
+CONFIG_LOCALVERSION="-v8-SNADOL"
 
 LINUX_REPO=https://github.com/raspberrypi/linux
 FIRMWARE_REPO=https://github.com/raspberrypi/firmware
@@ -17,14 +19,21 @@ deps:
 	if cd firmware/; then git pull; else git clone --depth 1 $(FIRMWARE_REPO); fi
 	if cd busybox/; then git pull; else git clone --depth 1 $(BUSYBOX_REPO); fi
 
-kernel_config:
+kernel_defconfig:
 	$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
 
+busybox_defconfig:
+	echo "CONFIG_STATIC=y\nCONFIG_CROSS_COMPILER_PREFIX=\"$(CROSS_COMPILE)\"\nCONFIG_PREFIX=\"$(INSTALL_MOD_PATH)\"" > busybox/configs/CM4_defconfig
+	$(MAKE) -C busybox -j`nproc` CM4_defconfig
+
+kernel_config:
+	$(MAKE) -C linux menuconfig
+
 busybox_config:
-	cp busybox_config busybox/.config
+	$(MAKE) -C busybox menuconfig
 
 kernel:
-	$(MAKE) -C linux -j`nproc` zImage modules dtbs
+	$(MAKE) -C linux -j`nproc` Image modules dtbs
 
 busybox:
 	$(MAKE) -C busybox -j`nproc`
@@ -35,9 +44,12 @@ fs: kernel busybox
 
 	cp firmware/boot/fixup4.dat $(BOOT_DIR)
 	cp firmware/boot/start4.elf $(BOOT_DIR)
-	cp linux/arch/arm/boot/zImage $(BOOT_DIR)
-	cp linux/arch/arm/boot/dts/bcm2711-rpi-cm4.dtb $(BOOT_DIR)
-	cp linux/arch/arm/boot/dts/overlays/disable-bt.dtbo $(BOOT_DIR)/overlays
+
+	cp linux/arch/arm64/boot/dts/broadcom/*.dtb $(BOOT_DIR)
+	cp linux/arch/arm64/boot/dts/overlays/*.dtb* $(BOOT_DIR)/overlays/
+	cp linux/arch/arm64/boot/dts/overlays/README $(BOOT_DIR)/overlays/
+	cp linux/arch/arm64/boot/Image $(BOOT_DIR)/$KERNEL.img
+
 	cp config.txt $(BOOT_DIR)
 	cp cmdline.txt $(BOOT_DIR)
 
@@ -57,7 +69,7 @@ fs: kernel busybox
 	echo "echo /sbin/mdev > /proc/sys/kernel/hotplug" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
 	echo "mdev -s" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
 
-	cd $(INSTALL_MOD_PATH); find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
+	#cd $(INSTALL_MOD_PATH); find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
 
 .ONESHELL:
 img: fs
@@ -84,6 +96,8 @@ img: fs
 	rm -r $(ROOT_DIR)out/tmp
 
 clean:
-	rm -r $(ROOT_DIR)out
+	$(MAKE) -C linux clean
+	$(MAKE) -C busybox clean
+	rm -rf $(ROOT_DIR)out
 
 .PHONY: busybox busybox_config kernel kernel_config fs

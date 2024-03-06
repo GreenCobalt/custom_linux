@@ -2,7 +2,5 @@ start_file=start4.elf
 fixup_file=fixup4.dat
 kernel=zImage
 
-arm_64bit=0
 device_tree=bcm2711-rpi-cm4.dtb
-
 dtoverlay=disable-bt
