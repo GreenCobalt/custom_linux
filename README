@@ -1,0 +1,1 @@
+sudo apt install bc bison crossbuild-essential-armhf flex git libc6-dev libncurses5-dev libssl-dev
