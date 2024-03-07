@@ -2,6 +2,7 @@
 ARCH=arm64
 KERNEL=kernel8
 CROSS_COMPILE=aarch64-linux-gnu-
+HOST=aarch64-linux-gnu
 CPU=bcm2711
 
 CONFIG_LOCALVERSION="-v8-SNADOL"
@@ -14,34 +15,53 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 INSTALL_MOD_PATH=$(ROOT_DIR)out/rootfs
 BOOT_DIR=$(ROOT_DIR)out/boot
 
+all: kernel busybox fs img
+	@echo "Done"
+
 deps:
-	if cd linux/; then git pull; else git clone --depth 1 $(LINUX_REPO); fi
-	if cd firmware/; then git pull; else git clone --depth 1 $(FIRMWARE_REPO); fi
-	if cd busybox/; then git pull; else git clone --depth 1 $(BUSYBOX_REPO); fi
+	if cd $(ROOT_DIR)linux/; then git pull; else git clone --depth 1 $(LINUX_REPO); fi
+	if cd $(ROOT_DIR)firmware/; then git pull; else git clone --depth 1 $(FIRMWARE_REPO); fi
+	if cd $(ROOT_DIR)busybox/; then git pull; else git clone --depth 1 $(BUSYBOX_REPO); fi
 
-kernel_defconfig:
-	$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
+	$(MAKE) -C ${ROOT_DIR}packages/htop deps
+	$(MAKE) -C ${ROOT_DIR}packages/ncurses deps
 
-busybox_defconfig:
+defconfig:
+	#$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
+	cp linux_config linux/.config
+
 	echo "CONFIG_STATIC=y\nCONFIG_CROSS_COMPILER_PREFIX=\"$(CROSS_COMPILE)\"\nCONFIG_PREFIX=\"$(INSTALL_MOD_PATH)\"" > busybox/configs/CM4_defconfig
 	$(MAKE) -C busybox -j`nproc` CM4_defconfig
 
-kernel_config:
-	$(MAKE) -C linux menuconfig
-
-busybox_config:
-	$(MAKE) -C busybox menuconfig
+	$(MAKE) -C ${ROOT_DIR}packages/htop configure
+	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure
 
 kernel:
-	$(MAKE) -C linux -j`nproc` Image modules dtbs
+	$(MAKE) -C linux -j`nproc` Image dtbs
+	#$(MAKE) -C linux -l`nproc` modules
 
-busybox:
+packages:
 	$(MAKE) -C busybox -j`nproc`
+	$(MAKE) -C ${ROOT_DIR}packages/htop build
+	$(MAKE) -C ${ROOT_DIR}packages/ncurses build
 
-fs: kernel busybox
+fs:
 	rm -rf out/
 
 	mkdir -p $(INSTALL_MOD_PATH)
+	cp -r skeleton/* out/rootfs/
+	mkdir -p $(INSTALL_MOD_PATH)/etc
+	mkdir -p $(INSTALL_MOD_PATH)/etc/init.d
+	mkdir -p $(INSTALL_MOD_PATH)/proc 
+	mkdir -p $(INSTALL_MOD_PATH)/sys
+	mkdir -p $(INSTALL_MOD_PATH)/dev
+	mkdir -p $(INSTALL_MOD_PATH)/tmp
+	mkdir -p $(INSTALL_MOD_PATH)/root
+	mkdir -p $(INSTALL_MOD_PATH)/var
+	mkdir -p $(INSTALL_MOD_PATH)/lib
+	mkdir -p $(INSTALL_MOD_PATH)/mnt
+	mkdir -p $(INSTALL_MOD_PATH)/boot
+
 	mkdir -p $(BOOT_DIR)/overlays
 
 	cp firmware/boot/fixup4.dat $(BOOT_DIR)
@@ -55,61 +75,48 @@ fs: kernel busybox
 	cp config.txt $(BOOT_DIR)
 	cp cmdline.txt $(BOOT_DIR)
 
-	$(MAKE) -C linux modules_install
+	#$(MAKE) -C linux modules_install
 	$(MAKE) -C busybox install
 
-	mkdir -p $(INSTALL_MOD_PATH)/etc
-	mkdir -p $(INSTALL_MOD_PATH)/etc/init.d
-	mkdir -p $(INSTALL_MOD_PATH)/proc 
-	mkdir -p $(INSTALL_MOD_PATH)/sys
-	mkdir -p $(INSTALL_MOD_PATH)/dev
-	mkdir -p $(INSTALL_MOD_PATH)/tmp
-	mkdir -p $(INSTALL_MOD_PATH)/root
-	mkdir -p $(INSTALL_MOD_PATH)/var
-	mkdir -p $(INSTALL_MOD_PATH)/lib
-	mkdir -p $(INSTALL_MOD_PATH)/mnt
-	mkdir -p $(INSTALL_MOD_PATH)/boot
-
-	install busybox/examples/inittab $(INSTALL_MOD_PATH)/etc/inittab
-
-	touch $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	chmod +x $(INSTALL_MOD_PATH)/etc/init.d/rcS
-
-	echo "#!/bin/sh" > $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	echo "mdev -s" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
-	echo "echo SYSTEM BOOTED TO INIT SPACE" >> $(INSTALL_MOD_PATH)/etc/init.d/rcS
-
-	#cd $(INSTALL_MOD_PATH); find . -print0 | cpio --null -ov --format=newc | gzip -9 > ../initramfs.cpio.gz
+	$(MAKE) -C ${ROOT_DIR}packages/htop install
+	$(MAKE) -C ${ROOT_DIR}packages/ncurses install
 
 .ONESHELL:
-img: fs
-	dd if=/dev/zero of=out/disk.img bs=1MiB count=512
+img:
+	dd if=/dev/zero of=out/disk.img bs=1MiB count=300
 	sfdisk out/disk.img < disk.sfdisk
 
 	KX=$$(sudo kpartx -avs out/disk.img | grep -m1 -Eo loop..?p)
-	mkfs -t vfat /dev/mapper/$${KX}1
-	mkfs -t ext4 /dev/mapper/$${KX}2
-
-	echo /dev/mapper/$${KX}
+	sudo mkfs -t vfat /dev/mapper/$${KX}1
+	sudo mkfs -t ext4 /dev/mapper/$${KX}2
 
 	mkdir -p $(ROOT_DIR)out/tmp/boot
 	mkdir -p $(ROOT_DIR)out/tmp/rootfs
 
-	mount -o loop /dev/mapper/$${KX}1 $(ROOT_DIR)out/tmp/boot
-	mount -o loop /dev/mapper/$${KX}2 $(ROOT_DIR)out/tmp/rootfs
+	sudo mount -o loop /dev/mapper/$${KX}1 $(ROOT_DIR)out/tmp/boot
+	sudo mount -o loop /dev/mapper/$${KX}2 $(ROOT_DIR)out/tmp/rootfs
 
-	cp -r $(BOOT_DIR)/* $(ROOT_DIR)out/tmp/boot
-	cp -r $(INSTALL_MOD_PATH)/* $(ROOT_DIR)out/tmp/rootfs
+	sudo cp -r $(BOOT_DIR)/* $(ROOT_DIR)out/tmp/boot
+	sudo cp -r $(INSTALL_MOD_PATH)/* $(ROOT_DIR)out/tmp/rootfs
 
-	umount $(ROOT_DIR)out/tmp/boot
-	umount $(ROOT_DIR)out/tmp/rootfs
+	sudo umount $(ROOT_DIR)out/tmp/boot
+	sudo umount $(ROOT_DIR)out/tmp/rootfs
 
-	sudo kpartx -dv out/disk.img
-	rm -r $(ROOT_DIR)out/tmp
+	sudo kpartx -dv $(ROOT_DIR)out/disk.img
+	sudo rm -r $(ROOT_DIR)out/tmp
+	exit
 
 clean:
 	$(MAKE) -C linux clean
 	$(MAKE) -C busybox clean
+	$(MAKE) -C ${ROOT_DIR}packages/htop clean
+	$(MAKE) -C ${ROOT_DIR}packages/ncurses clean
 	rm -rf $(ROOT_DIR)out
 
-.PHONY: busybox busybox_config kernel kernel_config fs
+kernel_config:
+	$(MAKE) -C linux menuconfig
+
+busybox_config:
+	$(MAKE) -C busybox menuconfig
+
+.PHONY: busybox busybox_config kernel kernel_config fs packages
