@@ -15,7 +15,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 INSTALL_MOD_PATH=$(ROOT_DIR)out/rootfs
 BOOT_DIR=$(ROOT_DIR)out/boot
 
-all: kernel busybox fs img
+all: kernel packages fs img
 	@echo "Done"
 
 deps:
@@ -25,25 +25,28 @@ deps:
 
 	$(MAKE) -C ${ROOT_DIR}packages/htop deps
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses deps
+	$(MAKE) -C ${ROOT_DIR}packages/neofetch deps
 
 defconfig:
-	#$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
-	cp linux_config linux/.config
+	$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
+	sed -i 's/CONFIG_USB_NET_SMSC75XX=m/CONFIG_USB_NET_SMSC75XX=y/g' linux/arch/arm64/configs/$(cpu)_defconfig
 
 	echo "CONFIG_STATIC=y\nCONFIG_CROSS_COMPILER_PREFIX=\"$(CROSS_COMPILE)\"\nCONFIG_PREFIX=\"$(INSTALL_MOD_PATH)\"" > busybox/configs/CM4_defconfig
 	$(MAKE) -C busybox -j`nproc` CM4_defconfig
 
 	$(MAKE) -C ${ROOT_DIR}packages/htop configure
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure
+	$(MAKE) -C ${ROOT_DIR}packages/neofetch configure
 
 kernel:
 	$(MAKE) -C linux -j`nproc` Image dtbs
-	#$(MAKE) -C linux -l`nproc` modules
+	$(MAKE) -C linux -l`nproc` modules
 
 packages:
 	$(MAKE) -C busybox -j`nproc`
 	$(MAKE) -C ${ROOT_DIR}packages/htop build
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses build
+	$(MAKE) -C ${ROOT_DIR}packages/neofetch build
 
 fs:
 	rm -rf out/
@@ -75,11 +78,17 @@ fs:
 	cp config.txt $(BOOT_DIR)
 	cp cmdline.txt $(BOOT_DIR)
 
-	#$(MAKE) -C linux modules_install
+	$(MAKE) -C linux modules_install
 	$(MAKE) -C busybox install
 
 	$(MAKE) -C ${ROOT_DIR}packages/htop install
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses install
+	$(MAKE) -C ${ROOT_DIR}packages/neofetch install
+
+	cp os-release $(INSTALL_MOD_PATH)/lib
+	ln -s $(INSTALL_MOD_PATH)/lib/os-release $(INSTALL_MOD_PATH)/etc/os-release
+
+	@echo "FS BUILD DONE"
 
 .ONESHELL:
 img:
@@ -111,6 +120,7 @@ clean:
 	$(MAKE) -C busybox clean
 	$(MAKE) -C ${ROOT_DIR}packages/htop clean
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses clean
+	$(MAKE) -C ${ROOT_DIR}packages/neofetch clean
 	rm -rf $(ROOT_DIR)out
 
 kernel_config:
