@@ -85,9 +85,6 @@ fs:
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses install
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch install
 
-	cp os-release $(INSTALL_MOD_PATH)/lib
-	ln -s $(INSTALL_MOD_PATH)/lib/os-release $(INSTALL_MOD_PATH)/etc/os-release
-
 	@echo "FS BUILD DONE"
 
 .ONESHELL:
