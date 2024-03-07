@@ -40,7 +40,7 @@ defconfig:
 
 kernel:
 	$(MAKE) -C linux -j`nproc` Image dtbs
-	$(MAKE) -C linux -l`nproc` modules
+	$(MAKE) -C linux -j`nproc` modules
 
 packages:
 	$(MAKE) -C busybox -j`nproc`
