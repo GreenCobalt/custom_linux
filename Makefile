@@ -105,6 +105,9 @@ img:
 	sudo cp -r $(BOOT_DIR)/* $(ROOT_DIR)out/tmp/boot
 	sudo cp -r $(INSTALL_MOD_PATH)/* $(ROOT_DIR)out/tmp/rootfs
 
+	sudo chmod +x $(ROOT_DIR)out/tmp/rootfs/etc/init.d/rcS
+	sudo ln -s $(ROOT_DIR)out/tmp/rootfs/lib/os-release $(ROOT_DIR)out/tmp/rootfs/etc/os-release
+
 	sudo umount $(ROOT_DIR)out/tmp/boot
 	sudo umount $(ROOT_DIR)out/tmp/rootfs
 
