@@ -11,7 +11,7 @@ CXX=aarch64-linux-gnu-g++
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 ROOT_DIR:=$(PACKAGE_DIR)../../
 
-AUTOCONF_ENV = STRIP="aarch64-linux-gnu-strip" CPPFLAGS="-I${ROOT_DIR}out/rootfs/include" LDFLAGS="-L${ROOT_DIR}out/rootfs/lib"
+AUTOCONF_ENV = STRIP="aarch64-linux-gnu-strip" CPPFLAGS="-static -I${ROOT_DIR}out/rootfs/include" LDFLAGS="-L${ROOT_DIR}out/rootfs/lib"
 AUTOCONF_TARGET = --host=${HOST}
 AUTOCONF_CACHE = 
 
@@ -22,7 +22,7 @@ deps:
 configure:
 	cd ${PACKAGE_DIR}${NAME};\
 	${AUTOCONF_ENV} ./configure --prefix=${ROOT_DIR}out/rootfs ${AUTOCONF_TARGET} ${AUTOCONF_CACHE} \
-	--with-normal --without-bash-malloc --with-system-type=${HOST} --with-fallbacks=vt100,vt102,screen
+	--with-normal --without-bash-malloc --with-system-type=${HOST} --disable-shared --with-fallbacks=vt100,vt102,screen --enable-widec --with-curses=/sw --enable-termcap --with-termlib=tinfo --with-default-terminfo=/usr/share/terminfo
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`

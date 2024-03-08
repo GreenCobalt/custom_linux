@@ -46,6 +46,7 @@ fs:
 	cp -r skeleton/* out/rootfs/
 
 packages:
+	$(MAKE) -C ${ROOT_DIR}packages/termcap configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/htop configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/bash configure build install

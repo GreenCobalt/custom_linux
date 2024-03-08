@@ -7,11 +7,12 @@ CROSS_COMPILE=aarch64-linux-gnu-
 HOST=aarch64-linux-gnu
 CC=aarch64-linux-gnu-gcc
 CXX=aarch64-linux-gnu-g++
+STRIP=aarch64-linux-gnu-strip
 
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 ROOT_DIR:=$(PACKAGE_DIR)../../
 
-AUTOCONF_ENV = STRIP="aarch64-linux-gnu-strip" CPPFLAGS="-I${ROOT_DIR}out/rootfs/include" LDFLAGS="-L${ROOT_DIR}out/rootfs/lib"
+AUTOCONF_ENV = STRIP="${STRIP}" CPPFLAGS="-I${ROOT_DIR}out/rootfs/include" LDFLAGS="-L${ROOT_DIR}out/rootfs/lib"
 AUTOCONF_TARGET = --host=${HOST}
 AUTOCONF_CACHE = 
 
