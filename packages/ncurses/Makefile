@@ -11,11 +11,18 @@ CXX=aarch64-linux-gnu-g++
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 ROOT_DIR:=$(PACKAGE_DIR)../../
 
+AUTOCONF_ENV = STRIP="aarch64-linux-gnu-strip" CPPFLAGS="-I${ROOT_DIR}out/rootfs/include" LDFLAGS="-L${ROOT_DIR}out/rootfs/lib"
+AUTOCONF_TARGET = --host=${HOST}
+AUTOCONF_CACHE = 
+
 deps:
 	if cd ${PACKAGE_DIR}${NAME}; then echo DOWNLOADED; else wget -O ${PACKAGE_DIR}ncurses.tar.gz $(REPO); gunzip ${PACKAGE_DIR}ncurses.tar.gz; tar xf ${PACKAGE_DIR}ncurses.tar; rm ${PACKAGE_DIR}ncurses.tar; fi
+	cd ${PACKAGE_DIR}${NAME}; sed -i 's/INSTALL_OPT_S="-s"/INSTALL_OPT_S="-s --strip-program=$${STRIP}"/g' configure
 
 configure:
-	cd ${PACKAGE_DIR}${NAME}; ./configure --prefix=${ROOT_DIR}out/rootfs --config-cache --cache-file=${ROOT_DIR}.config_cache --build=${HOST} --target=${HOST}
+	cd ${PACKAGE_DIR}${NAME};\
+	${AUTOCONF_ENV} ./configure --prefix=${ROOT_DIR}out/rootfs ${AUTOCONF_TARGET} ${AUTOCONF_CACHE} \
+	--with-normal --without-bash-malloc --with-system-type=${HOST}
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`

@@ -15,7 +15,7 @@ ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 INSTALL_MOD_PATH=$(ROOT_DIR)out/rootfs
 BOOT_DIR=$(ROOT_DIR)out/boot
 
-all: kernel packages fs img
+all: kernel fs packages fs2 img
 	@echo "Done"
 
 deps:
@@ -26,7 +26,6 @@ deps:
 	$(MAKE) -C ${ROOT_DIR}packages/htop deps
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses deps
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch deps
-	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors deps
 	$(MAKE) -C ${ROOT_DIR}packages/bash deps
 
 defconfig:
@@ -36,41 +35,23 @@ defconfig:
 	echo "CONFIG_STATIC=y\nCONFIG_CROSS_COMPILER_PREFIX=\"$(CROSS_COMPILE)\"\nCONFIG_PREFIX=\"$(INSTALL_MOD_PATH)\"" > busybox/configs/CM4_defconfig
 	$(MAKE) -C busybox -j`nproc` CM4_defconfig
 
-	$(MAKE) -C ${ROOT_DIR}packages/htop configure
-	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure
-	$(MAKE) -C ${ROOT_DIR}packages/neofetch configure
-	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors configure
-	$(MAKE) -C ${ROOT_DIR}packages/bash configure
-
 kernel:
 	$(MAKE) -C linux -j`nproc` Image dtbs
 	$(MAKE) -C linux -j`nproc` modules
-
-packages:
 	$(MAKE) -C busybox -j`nproc`
-	$(MAKE) -C ${ROOT_DIR}packages/htop build
-	$(MAKE) -C ${ROOT_DIR}packages/ncurses build
-	$(MAKE) -C ${ROOT_DIR}packages/neofetch build
-	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors build
-	$(MAKE) -C ${ROOT_DIR}packages/bash build
 
 fs:
 	rm -rf out/
-
-	mkdir -p $(INSTALL_MOD_PATH)
+	mkdir -p out/rootfs/
 	cp -r skeleton/* out/rootfs/
-	mkdir -p $(INSTALL_MOD_PATH)/etc
-	mkdir -p $(INSTALL_MOD_PATH)/etc/init.d
-	mkdir -p $(INSTALL_MOD_PATH)/proc 
-	mkdir -p $(INSTALL_MOD_PATH)/sys
-	mkdir -p $(INSTALL_MOD_PATH)/dev
-	mkdir -p $(INSTALL_MOD_PATH)/tmp
-	mkdir -p $(INSTALL_MOD_PATH)/root
-	mkdir -p $(INSTALL_MOD_PATH)/var
-	mkdir -p $(INSTALL_MOD_PATH)/lib
-	mkdir -p $(INSTALL_MOD_PATH)/mnt
-	mkdir -p $(INSTALL_MOD_PATH)/boot
 
+packages:
+	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure build install
+	$(MAKE) -C ${ROOT_DIR}packages/htop configure build install
+	$(MAKE) -C ${ROOT_DIR}packages/bash configure build install
+	$(MAKE) -C ${ROOT_DIR}packages/neofetch configure build install
+
+fs2:
 	mkdir -p $(BOOT_DIR)/overlays
 
 	cp firmware/boot/fixup4.dat $(BOOT_DIR)
@@ -86,12 +67,6 @@ fs:
 
 	$(MAKE) -C linux modules_install
 	$(MAKE) -C busybox install
-
-	$(MAKE) -C ${ROOT_DIR}packages/htop install
-	$(MAKE) -C ${ROOT_DIR}packages/ncurses install
-	$(MAKE) -C ${ROOT_DIR}packages/neofetch install
-	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors install
-	$(MAKE) -C ${ROOT_DIR}packages/bash install
 
 	@echo "FS BUILD DONE"
 
@@ -129,7 +104,6 @@ clean:
 	$(MAKE) -C ${ROOT_DIR}packages/htop clean
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses clean
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch clean
-	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors clean
 	$(MAKE) -C ${ROOT_DIR}packages/bash clean
 	rm -rf $(ROOT_DIR)out
 	rm -f .config_cache
