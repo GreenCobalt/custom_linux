@@ -26,7 +26,7 @@ configure:
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
-	cd ${PACKAGE_DIR}${NAME}; ${STRIP} src/bash
+	cd ${PACKAGE_DIR}${NAME}; ${STRIP} bash
 
 install:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} install
