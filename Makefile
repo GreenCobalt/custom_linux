@@ -37,6 +37,7 @@ defconfig:
 	$(MAKE) -C ${ROOT_DIR}packages/htop configure
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch configure
+	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors configure
 
 kernel:
 	$(MAKE) -C linux -j`nproc` Image dtbs
@@ -47,6 +48,7 @@ packages:
 	$(MAKE) -C ${ROOT_DIR}packages/htop build
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses build
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch build
+	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors build
 
 fs:
 	rm -rf out/
@@ -84,6 +86,7 @@ fs:
 	$(MAKE) -C ${ROOT_DIR}packages/htop install
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses install
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch install
+	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors install
 
 	@echo "FS BUILD DONE"
 
@@ -121,6 +124,7 @@ clean:
 	$(MAKE) -C ${ROOT_DIR}packages/htop clean
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses clean
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch clean
+	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors clean
 	rm -rf $(ROOT_DIR)out
 
 kernel_config:

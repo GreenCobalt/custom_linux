@@ -6,7 +6,7 @@ KERNEL=kernel8
 CROSS_COMPILE=aarch64-linux-gnu-
 
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
-ROOT_DIR:=$(PACKAGE_DIR)/../../
+ROOT_DIR:=$(PACKAGE_DIR)../../
 
 deps:
 	if cd ${PACKAGE_DIR}${NAME}; then git pull; else cd ${PACKAGE_DIR}; git clone --depth 1 $(REPO); fi

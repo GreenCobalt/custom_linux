@@ -6,7 +6,7 @@ KERNEL=kernel8
 CROSS_COMPILE=aarch64-linux-gnu-
 
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
-ROOT_DIR:=$(PACKAGE_DIR)/../../
+ROOT_DIR:=$(PACKAGE_DIR)../../
 
 deps:
 	if cd ${PACKAGE_DIR}${NAME}; then echo DOWNLOADED; else wget -O ${PACKAGE_DIR}ncurses.tar.gz $(REPO); gunzip ${PACKAGE_DIR}ncurses.tar.gz; tar xf ${PACKAGE_DIR}ncurses.tar; rm ${PACKAGE_DIR}ncurses.tar; fi
