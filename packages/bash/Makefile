@@ -13,7 +13,7 @@ deps:
 	if cd ${PACKAGE_DIR}${NAME}; then git pull; else cd ${PACKAGE_DIR}; git clone --depth 1 $(REPO); fi
 
 configure:
-	cd ${PACKAGE_DIR}${NAME}; ./configure --prefix=${ROOT_DIR}out/rootfs --config-cache --cache-file=${ROOT_DIR}.config_cache --host=${HOST} --enable-static-link --without-bash-malloc
+	cd ${PACKAGE_DIR}${NAME}; ./configure --prefix=${ROOT_DIR}out/rootfs --config-cache --cache-file=${ROOT_DIR}.config_cache --build=${HOST} --enable-static-link --without-bash-malloc
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
