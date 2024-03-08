@@ -4,6 +4,7 @@ REPO=https://ftp.gnu.org/gnu/ncurses/ncurses-6.4.tar.gz
 ARCH=arm64
 KERNEL=kernel8
 CROSS_COMPILE=aarch64-linux-gnu-
+HOST=aarch64-linux-gnu
 
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 ROOT_DIR:=$(PACKAGE_DIR)../../
