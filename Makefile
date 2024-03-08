@@ -24,6 +24,8 @@ deps:
 	if cd $(ROOT_DIR)busybox/; then git pull; else git clone --depth 1 $(BUSYBOX_REPO); fi
 
 	$(MAKE) -C ${ROOT_DIR}packages/htop deps
+	$(MAKE) -C ${ROOT_DIR}packages/termcap deps
+	$(MAKE) -C ${ROOT_DIR}packages/nano deps
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses deps
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch deps
 	$(MAKE) -C ${ROOT_DIR}packages/bash deps
@@ -49,6 +51,7 @@ packages:
 	$(MAKE) -C ${ROOT_DIR}packages/termcap configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/htop configure build install
+	$(MAKE) -C ${ROOT_DIR}packages/nano configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/bash configure build install
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch configure build install
 
@@ -117,6 +120,8 @@ clean:
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses clean
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch clean
 	$(MAKE) -C ${ROOT_DIR}packages/bash clean
+	$(MAKE) -C ${ROOT_DIR}packages/termcap clean
+	$(MAKE) -C ${ROOT_DIR}packages/nano clean
 	rm -rf $(ROOT_DIR)out
 	rm -f .config_cache
 
