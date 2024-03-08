@@ -10,6 +10,8 @@ CC=aarch64-linux-gnu-gcc
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 ROOT_DIR:=$(PACKAGE_DIR)../../
 
+ETCDIR=${ROOT_DIR}out/rootfs/etc
+
 deps:
 	if cd ${PACKAGE_DIR}${NAME}; then git pull; else cd ${PACKAGE_DIR}; git clone --depth 1 $(REPO); fi
 
