@@ -14,7 +14,7 @@ deps:
 
 configure:
 	cd ${PACKAGE_DIR}${NAME}; ./autogen.sh
-	cd ${PACKAGE_DIR}${NAME}; ./configure --enable-static --enable-sensors --prefix=${ROOT_DIR}out/rootfs --build=${HOST} --config-cache --cache-file=${ROOT_DIR}.config_cache
+	cd ${PACKAGE_DIR}${NAME}; ./configure --enable-static --enable-sensors --prefix=${ROOT_DIR}out/rootfs --build=${HOST} --target=${HOST} --config-cache --cache-file=${ROOT_DIR}.config_cache
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
