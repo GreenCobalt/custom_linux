@@ -4,3 +4,4 @@ linux/
 out/
 .vscode
 packages/*/*/
+.config_cache
