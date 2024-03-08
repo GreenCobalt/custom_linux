@@ -23,7 +23,7 @@ configure:
 	cd ${PACKAGE_DIR}${NAME}; ./autogen.sh
 	cd ${PACKAGE_DIR}${NAME};\
 	${AUTOCONF_ENV} ./configure --prefix=${ROOT_DIR}out/rootfs ${AUTOCONF_TARGET} ${AUTOCONF_CACHE} \
-	--enable-static --disable-sensors --disable-unicode
+	--enable-static --disable-sensors
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
