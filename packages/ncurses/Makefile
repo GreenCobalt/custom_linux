@@ -22,7 +22,7 @@ deps:
 configure:
 	cd ${PACKAGE_DIR}${NAME};\
 	${AUTOCONF_ENV} ./configure --prefix=${ROOT_DIR}out/rootfs ${AUTOCONF_TARGET} ${AUTOCONF_CACHE} \
-	--with-normal --without-bash-malloc --with-system-type=${HOST}
+	--with-normal --without-bash-malloc --with-system-type=${HOST} --with-fallbacks=vt100,vt102,screen
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
