@@ -53,6 +53,17 @@ packages:
 
 fs2:
 	mkdir -p $(BOOT_DIR)/overlays
+	mkdir -p $(INSTALL_MOD_PATH)/etc
+	mkdir -p $(INSTALL_MOD_PATH)/etc/init.d
+	mkdir -p $(INSTALL_MOD_PATH)/proc 
+	mkdir -p $(INSTALL_MOD_PATH)/sys
+	mkdir -p $(INSTALL_MOD_PATH)/dev
+	mkdir -p $(INSTALL_MOD_PATH)/tmp
+	mkdir -p $(INSTALL_MOD_PATH)/root
+	mkdir -p $(INSTALL_MOD_PATH)/var
+	mkdir -p $(INSTALL_MOD_PATH)/lib
+	mkdir -p $(INSTALL_MOD_PATH)/mnt
+	mkdir -p $(INSTALL_MOD_PATH)/boot
 
 	cp firmware/boot/fixup4.dat $(BOOT_DIR)
 	cp firmware/boot/start4.elf $(BOOT_DIR)
