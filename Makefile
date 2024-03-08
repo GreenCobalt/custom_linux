@@ -28,8 +28,8 @@ deps:
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch deps
 
 defconfig:
-	$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
 	sed -i 's/CONFIG_USB_NET_SMSC75XX=m/CONFIG_USB_NET_SMSC75XX=y/g' linux/arch/arm64/configs/$(cpu)_defconfig
+	$(MAKE) -C linux -j`nproc` $(CPU)_defconfig
 
 	echo "CONFIG_STATIC=y\nCONFIG_CROSS_COMPILER_PREFIX=\"$(CROSS_COMPILE)\"\nCONFIG_PREFIX=\"$(INSTALL_MOD_PATH)\"" > busybox/configs/CM4_defconfig
 	$(MAKE) -C busybox -j`nproc` CM4_defconfig
