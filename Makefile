@@ -132,6 +132,7 @@ clean:
 	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors clean
 	$(MAKE) -C ${ROOT_DIR}packages/bash clean
 	rm -rf $(ROOT_DIR)out
+	rm -f .config_cache
 
 kernel_config:
 	$(MAKE) -C linux menuconfig
