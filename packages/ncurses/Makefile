@@ -13,7 +13,7 @@ deps:
 	if cd ${PACKAGE_DIR}${NAME}; then echo DOWNLOADED; else wget -O ${PACKAGE_DIR}ncurses.tar.gz $(REPO); gunzip ${PACKAGE_DIR}ncurses.tar.gz; tar xf ${PACKAGE_DIR}ncurses.tar; rm ${PACKAGE_DIR}ncurses.tar; fi
 
 configure:
-	cd ${PACKAGE_DIR}${NAME}; ./configure --prefix=${ROOT_DIR}out/rootfs --config-cache --cache-file=${ROOT_DIR}.config_cache
+	cd ${PACKAGE_DIR}${NAME}; ./configure --prefix=${ROOT_DIR}out/rootfs --config-cache --cache-file=${ROOT_DIR}.config_cache --host=${HOST}
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
