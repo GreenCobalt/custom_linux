@@ -5,6 +5,7 @@ ARCH=arm64
 KERNEL=kernel8
 CROSS_COMPILE=aarch64-linux-gnu-
 HOST=aarch64-linux-gnu
+CC=aarch64-linux-gnu-gcc
 
 PACKAGE_DIR=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))/
 ROOT_DIR:=$(PACKAGE_DIR)../../
