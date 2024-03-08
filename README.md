@@ -11,7 +11,7 @@ build process automatically uses all cpu cores (nproc * 1.5)
 
  1. *install dependencies (and toolchain)*
 
-`sudo apt install git bc bison flex libssl-dev make libc6-dev libncurses5-dev dosfstools gcc-aarch64-linux-gnu kpartx`
+`sudo apt install git bc bison flex libssl-dev make libc6-dev libncurses5-dev dosfstools gcc-aarch64-linux-gnu kpartx autoconf libsensors-dev`
 
  2. *begin build*
 
