@@ -26,6 +26,8 @@ deps:
 	$(MAKE) -C ${ROOT_DIR}packages/htop deps
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses deps
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch deps
+	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors deps
+	$(MAKE) -C ${ROOT_DIR}packages/bash deps
 
 defconfig:
 	sed -i 's/CONFIG_USB_NET_SMSC75XX=m/CONFIG_USB_NET_SMSC75XX=y/g' linux/arch/arm64/configs/$(cpu)_defconfig
@@ -38,6 +40,7 @@ defconfig:
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses configure
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch configure
 	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors configure
+	$(MAKE) -C ${ROOT_DIR}packages/bash configure
 
 kernel:
 	$(MAKE) -C linux -j`nproc` Image dtbs
@@ -49,6 +52,7 @@ packages:
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses build
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch build
 	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors build
+	$(MAKE) -C ${ROOT_DIR}packages/bash build
 
 fs:
 	rm -rf out/
@@ -87,6 +91,7 @@ fs:
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses install
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch install
 	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors install
+	$(MAKE) -C ${ROOT_DIR}packages/bash install
 
 	@echo "FS BUILD DONE"
 
@@ -125,6 +130,7 @@ clean:
 	$(MAKE) -C ${ROOT_DIR}packages/ncurses clean
 	$(MAKE) -C ${ROOT_DIR}packages/neofetch clean
 	$(MAKE) -C ${ROOT_DIR}packages/lm-sensors clean
+	$(MAKE) -C ${ROOT_DIR}packages/bash clean
 	rm -rf $(ROOT_DIR)out
 
 kernel_config:
