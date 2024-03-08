@@ -27,7 +27,7 @@ configure:
 
 build:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} -j`nproc`
-	cd ${PACKAGE_DIR}${NAME}; ${STRIP} src/htop
+	cd ${PACKAGE_DIR}${NAME}; ${STRIP} htop
 
 install:
 	$(MAKE) -C ${PACKAGE_DIR}${NAME} install
